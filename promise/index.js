@@ -1,69 +1,96 @@
 
-const PENDING  = Symbol('pending')
-const RESOLVED = Symbol('resolved')
-const REJECT   = Symbol('reject')
+const PENDING  = "PENDING"
+const FULFILLED = "fulfilled"
+const REJECT   = "REJECT"
 
 
 class myPromise {
     
     /*初始化传入的function */
     constructor(initFn) {
-        this.currentState     = PENDING
-        this.resolveCallbacks = []
-        this.rejectCallbacks  = []
+        this.promiseState   = PENDING
+        this.promiseResult  = undefined
 
-        // this._reslove = this._reslove.bind(this)
-        // console.log(this)
+        this.then    = this.then.bind(this)
+        this.catch   = this.catch.bind(this)
+        this.finally = this.finally.bind(this)
+        this.all     = this.all.bind(this)
+        
         initFn(this._reslove, this._reject)
     }
 
     then(userResolve, userReject){
-        if(this.currentState === PENDING) {
+        /*初始化 */
+        userResolve = userResolve ? userResolve : val => {}
+        userReject = userReject ? userReject : err => {}
 
+        if(this.promiseState === PENDING) {
+            return 
         }
 
-        if(this.currentState === RESOLVED) {
-            console.log('then')
-            this.resolveCallbacks.push(userResolve)
+        if(this.promiseState === FULFILLED) {
+            return (
+                new myPromise((resolve, reject) => {
+                    resolve(userResolve(this.promiseResult))
+                })
+            )
         }
 
-        if(this.currentState === REJECT) {
-            this.rejectCallbacks.push(userReject)
+        if(this.promiseState === REJECT) {
+            return (
+                new myPromise((resolve, reject) => {
+                    try {
+                        resolve(userReject(this.promiseResult))
+                    } catch (error) {
+                        reject(error)
+                    }
+                })
+            )
         }
 
     }
 
-    catch(){
-
+    catch(userCatch){
+        return (
+            new myPromise((resolve, reject) => {
+                try {
+                    resolve(userReject(this.promiseResult))
+                } catch (error) {
+                    reject(error)
+                }
+            })
+        )
     }
 
     finally(){
 
     }
+    all(){
+
+    }
 
     _reslove = val => {
-        this.currentState = RESOLVED
-        for(let i of this.resolveCallbacks) {
-            console.log(i)
-          this.resolveCallbacks[i](val)
-        }
+        this.promiseState = FULFILLED
+        this.promiseResult = val
     }
 
     _reject = err => {
-        this.currentState = REJECT
-        for(let i of this.rejectCallbacks) {
-          this.rejectCallbacks[i](err)
-        }
+        this.promiseState = REJECT
+        this.promiseResult = err
     }
-    
 
 
 }
 
 const main = () => {
-    new myPromise((resolve, reject) => {resolve(1)}).then( val => {
-        console.log(val)
-    })
+    new myPromise((resolve, reject) => {
+        resolve(1)
+    }).then( val => {
+        console.log(val);
+        return new myPromise((resolve, reject) => {
+            resolve(2)
+        })
+    }).then(val => console.log(val))
 }
 
 main()
