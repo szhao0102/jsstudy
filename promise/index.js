@@ -20,18 +20,23 @@ class myPromise {
     }
 
     then(userResolve, userReject){
+        let returnPromise
         /*初始化 */
         userResolve = userResolve ? userResolve : val => {}
         userReject = userReject ? userReject : err => {}
-
+        
         if(this.promiseState === PENDING) {
             return 
         }
 
         if(this.promiseState === FULFILLED) {
             return (
-                new myPromise((resolve, reject) => {
-                    resolve(userResolve(this.promiseResult))
+                returnPromise = new myPromise((resolve, reject) => {
+                    let result = userResolve(this.promiseResult)
+                    if(result === returnPromise) {
+                        return reject(new Error("error"))
+                    }
+                    return resolve(result)
                 })
             )
         }
@@ -87,10 +92,11 @@ const main = () => {
         resolve(1)
     }).then( val => {
         console.log(val);
-        return new myPromise((resolve, reject) => {
-            resolve(2)
-        })
-    }).then(val => console.log(val))
+        // return new myPromise((resolve, reject) => {
+        //     resolve(2)
+        // })
+    })
+        // }).then(val => console.log(val))
 }
 
 main()
