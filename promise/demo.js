@@ -21,6 +21,7 @@ function MyPromise(fn) {
       if (_this.currentState === PENDING) {
         _this.currentState = RESOLVED;
         _this.value = value;
+        console.log(iii++)
         _this.resolvedCallbacks.forEach(cb => cb());
       }
     })
@@ -52,7 +53,7 @@ MyPromise.prototype.then = function (onResolved, onRejected) {
   // 如果类型不是函数需要忽略，同时也实现了透传
   // Promise.resolve(4).then().then((value) => console.log(value))
   onResolved = typeof onResolved === 'function' ? onResolved : v => v;
-  onRejected = typeof onRejected === 'function' ? onRejected : r => throw r;
+  onRejected = typeof onRejected === 'function' ? onRejected : r => {throw r;}
 
   if (self.currentState === RESOLVED) {
     return (promise2 = new MyPromise(function (resolve, reject) {
@@ -85,24 +86,24 @@ MyPromise.prototype.then = function (onResolved, onRejected) {
 
   if (self.currentState === PENDING) {
     return (promise2 = new MyPromise(function (resolve, reject) {
-      self.resolvedCallbacks.push(function () {
-        // 考虑到可能会有报错，所以使用 try/catch 包裹
-        try {
-          var x = onResolved(self.value);
-          resolutionProcedure(promise2, x, resolve, reject);
-        } catch (r) {
-          reject(r);
-        }
-      });
+      // self.resolvedCallbacks.push(function () {
+      //   // 考虑到可能会有报错，所以使用 try/catch 包裹
+      //   try {
+      //     var x = onResolved(self.value);
+      //     resolutionProcedure(promise2, x, resolve, reject);
+      //   } catch (r) {
+      //     reject(r);
+      //   }
+      // });
 
-      self.rejectedCallbacks.push(function () {
-        try {
-          var x = onRejected(self.value);
-          resolutionProcedure(promise2, x, resolve, reject);
-        } catch (r) {
-          reject(r);
-        }
-      });
+      // self.rejectedCallbacks.push(function () {
+      //   try {
+      //     var x = onRejected(self.value);
+      //     resolutionProcedure(promise2, x, resolve, reject);
+      //   } catch (r) {
+      //     reject(r);
+      //   }
+      // });
     }));
   }
 };
@@ -167,3 +168,5 @@ function resolutionProcedure(promise2, x, resolve, reject) {
     resolve(x);
   }
 }
+
+window.MyPromise = MyPromise
