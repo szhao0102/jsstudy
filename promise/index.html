@@ -8,19 +8,40 @@
 </head>
 <body>
     <script src="./index.js"></script>
+    <!-- <script src="./demo.js"></script> -->
     <!-- <script>
         const main = () => {
-            console.log(new Promise((reslove, reject) => {
-                setTimeout(() => {
-                    reslove(1)
-                }, 1000 * 5)
-            } ).then((val)=>{
-                console.log(val)
+            console.log(new MyPromise((reslove, reject) => {
+                // setTimeout(() => {
+                //     reslove({then:() => console.log(1111)})
+                // }, 1000 * 5)
+                reslove(1)
+            }).then((val)=>{
+                // console.log(val)
+                return {then: () => console.log(111)}
             //     return new Promise((reslove, reject) => {
             //         reslove(2)
             //     })
-            // }).then(val => console.log(val))
-        }))
+            }).then(val => console.log(val))
+        )
+        }
+        main()
+    </script> -->
+    <!-- <script>
+       const main = () => {
+            console.log(new Promise((reslove, reject) => {
+                // setTimeout(() => {
+                //     reslove({then:() => console.log(1111)})
+                // }, 1000 * 5)
+                reslove(1)
+            }).then((val)=>{
+                // console.log(val)
+                return {then: () => console.log(111)}
+            //     return new Promise((reslove, reject) => {
+            //         reslove(2)
+            //     })
+            }).then(val => console.log(val))
+        )
         }
         main()
     </script> -->

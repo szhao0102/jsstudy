@@ -21,7 +21,6 @@ class myPromise {
         /*初始化 */
         userResolve = userResolve ? userResolve : val => {}
         userReject = userReject ? userReject : err => {}
-        // console.log(userResolve, 11111)
         if(this.promiseState === PENDING) {
             
             return (
@@ -32,43 +31,35 @@ class myPromise {
                 })
             )
         }
+        return (
+            returnPromise = new myPromise((resolve, reject) => {
+                let result = this.promiseState === FULFILLED ? 
+                             userResolve(this.promiseResult) :
+                             userReject(this.promiseResult)
 
-        if(this.promiseState === FULFILLED) {
-            return (
-                returnPromise = new myPromise((resolve, reject) => {
-                    let result = userResolve(this.promiseResult)
-                    if(result === returnPromise) {
-                        return reject(new Error("error"))
+                if(result === returnPromise) {
+                    return reject(new Error("error"))
+                }
+                
+                if(result instanceof myPromise) {
+                    if(result.promiseState !== PENDING) {
+                        return result.then(resolve, reject)
                     }
-                    if(result instanceof myPromise) {
-                        
-                        if(result.promiseState !== PENDING) {
-                            return result.then(resolve, reject)
-                        }
-                    }
-                    return resolve(result)
-                })
-            )
-        }
 
-        if(this.promiseState === REJECT) {
-            return (
-                new myPromise((resolve, reject) => {
+                }
 
-                    let result = userReject(this.promiseResult)
-                    if(result === returnPromise) {
-                        return reject(new Error("error"))
+                if(result != null && (typeof result === 'object' || typeof result === 'function')) {
+                    let then = result.then
+                    if(typeof then === 'function') {
+                        result = then.call(result)
                     }
-                    if(result instanceof myPromise) {
-                        if(result.promiseState !== PENDING) {
-                            return result.then(resolve, reject)
-                        }
-                    }
-                    return reject(result)
-                })
-            )
-        }
+                }
 
+                return (
+                    this.promiseState === FULFILLED ? resolve(result) : reject(result)
+                ) 
+            })
+        )
     }
 
     _reslove = val => {
@@ -88,14 +79,14 @@ class myPromise {
 }
 
 const main = () => {
-    console.log(new myPromise((resolve, reject) => {
-        setTimeout(() => {
-            resolve(1)
-        }, 1000 * 5)
+    new myPromise((resolve, reject) => {
+        resolve(1)
     }).then( val => {
         console.log(val);
-    })
-    )
+        return {
+            then: () => 111
+        }
+    }).then(val => console.log(val))
 }
 
 main()
