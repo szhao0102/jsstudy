@@ -44,6 +44,10 @@ class myPromise {
                 if(result instanceof myPromise) {
                     if(result.promiseState !== PENDING) {
                         return result.then(resolve, reject)
+                    } else {
+                        result.promiseThen = () => {
+                            result.then(resolve, reject)
+                        }
                     }
 
                 }
@@ -63,10 +67,14 @@ class myPromise {
     }
 
     _reslove = val => {
-        this.promiseState = FULFILLED
-        this.promiseResult = val
-        this.promiseThen && this.promiseThen()
-
+        if(val instanceof myPromise) {
+            return val.then(this._reslove, this._reject)
+        }
+        setTimeout(() => {
+            this.promiseState = FULFILLED
+            this.promiseResult = val
+            this.promiseThen && this.promiseThen()
+        })
     }
 
     _reject = err => {
@@ -80,13 +88,8 @@ class myPromise {
 
 const main = () => {
     new myPromise((resolve, reject) => {
-        resolve(1)
-    }).then( val => {
-        console.log(val);
-        return {
-            then: () => 111
-        }
-    }).then(val => console.log(val))
+        resolve(new myPromise((resolve, reject) => {setTimeout(()=> {resolve(1)})}))
+    }).then( val => {console.log(val);})
 }
 
 main()
