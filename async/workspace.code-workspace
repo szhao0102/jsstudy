@@ -1,0 +1,13 @@
+{
+	"folders": [
+		{
+			"path": "../../js-visualizer-9000-client-master"
+		},
+		{
+			"path": ".."
+		}
+	],
+	"settings": {
+		"liveServer.settings.multiRootWorkspaceName": "jsstudy"
+	}
+}
